@@ -198,15 +198,31 @@ def main():
     groups = re.match( r'(\d{4})(\d{2})(\d{2})', sys.argv[1] ).groups()
     day = date( int(groups[0]), int(groups[1]), int(groups[2]) )
 
+  #day=date(2017, 4,20 )
   #code = 'hzrb'
   newspaper = ['hzrb','dskb','mrsb'] 
   for code in newspaper:
-   pagelist = getPageList( day, code ) # 获得版面页面列表
-   for i in range(len(pagelist)):
-     BC = pagelist[i][2]
-     BM = pagelist[i][3]
-     dealBC( code, day, BC, BM, pagelist[i][1] )
-
+   log_mark=False
+   if os.path.exists('log.txt'):
+     f = open('log.txt','r')                                 #以读方式打开文件
+     for line in f.readlines():                             #依次读取每行
+       line = line.strip()                                    #去掉每行头尾空白
+       if not len(line) or line.startswith('#'):        #判断是否是空行或注释行
+          continue                                              #是的话，跳过不处理
+       elif line==(code+str(day)):
+          log_mark=True
+     f.close()
+   if not log_mark:
+     pagelist = getPageList( day, code ) # 获得版面页面列表
+     pagelist_len=len(pagelist)
+     for i in range(pagelist_len):
+       BC = pagelist[i][2]
+       BM = pagelist[i][3]
+       dealBC( code, day, BC, BM, pagelist[i][1] )
+       if i==(pagelist_len-1):
+          f = open('log.txt','a')
+          f.write(code+str(day)+'\n')
+          f.close()
 
 
 
